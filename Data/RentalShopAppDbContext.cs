@@ -18,6 +18,7 @@
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseSqlServer("Data Source = PIRATEN - KOMP\\SQLEXPRESS; Initial Catalog = RentalShopStorage; Integrated Security = True; Encrypt = False)");
+            
         }
          
     }

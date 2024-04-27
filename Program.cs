@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RentalShopApp;
+
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Authentication.ExtendedProtection;
 
-
+var services = new ServiceCollection();
 
 
 var sqlBooksRepository = new SQLRepository<Book>(new RentalShopAppDbContext());
