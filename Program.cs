@@ -1,11 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RentalShopApp;
-
-using Microsoft.Extensions.DependencyInjection;
-using System.Security.Authentication.ExtendedProtection;
-
-var services = new ServiceCollection();
-
+﻿using RentalShopApp.Repositories;
+using RentalShopApp.Data;
+using RentalShopApp.Entities;
 
 var sqlBooksRepository = new SQLRepository<Book>(new RentalShopAppDbContext());
 var sqlCDsMusicRepository = new SQLRepository<CDMusic>(new RentalShopAppDbContext());
@@ -171,18 +166,7 @@ static void RemovingClientLog(object? sender, Client item)
         writer.Write(dateTime + " " + "ClientRemoved " + "[" + item.FirstName + " " + item.LastName + "]\n");
     }
 }
-static void AddBooks(IRepository<Book> sqlBooksRepository)
-{
-    var books = new[]
-    {
-        new Book { Title = "Kajko i Kokosz: Szkoła latania", Author = "Janusz Christa", Genre = "Fantasy", ReleaseDate = 1981 },
-        new Book { Title = "Potop", Author = "Henryk Sienkiewicz", Genre = "Powieść historyczna", ReleaseDate = 1886 },
-        new Book { Title = "Igła", Author = "Ken Follett", Genre = "Powieść wojenna", ReleaseDate = 1978 },
-        new Book { Title = "Tytus, Romek i A’Tomek – Księga XIX. Tytus aktorem", Author = "Henryk Jerzy Chmielewski", Genre = "Fantasy", ReleaseDate = 1992 },
-        new Book { Title = "Batman vs Predator", Author = "Dave Gibbons", Genre = "Sensacja/Fantasy", ReleaseDate = 1993 }
-    };
-    sqlBooksRepository.AddBatch(books);
-}
+
 static void DisplayAllItems(IReadRepository<IEntity> repository)
 {
     var items = repository.GetAll();
@@ -373,12 +357,12 @@ ConsoleKeyInfo DisplayAddingSubmenu()
                       "*************************************************");
     Console.ForegroundColor = ConsoleColor.White;
     Console.Write("--------SubMenu----------\n" +
-                  "1. Add Book\n" +
-                  "2. Add CD Music\n" +
-                  "3. Add PC Game\n" +
-                  "4. Add Personnel\n" +
-                  "5. Add Client\n" +
-                  "6. Create objects for all repositories(automatic)\n" +
+                  "1. Add Book to Database\n" +
+                  "2. Add CD Music to Database\n" +
+                  "3. Add PC Game to Database\n" +
+                  "4. Add Personnel to Database\n" +
+                  "5. Add Client to Database\n" +
+                  "6. Create all data for tables in database\n" +
                   "7. Return to main menu\n" +
                   "Choose option:");
     return Console.ReadKey();
@@ -392,12 +376,12 @@ ConsoleKeyInfo DisplayDeletingSubmenu()
                       "*************************************************");
     Console.ForegroundColor = ConsoleColor.White;
     Console.Write("--------SubMenu----------\n" +
-                  "1. Delete Book\n" +
-                  "2. Delete CD Music\n" +
-                  "3. Delete PC Game\n" +
-                  "4. Delete Personnel\n" +
-                  "5. Delete Client\n" +
-                  "6. Delete all objects from all repositories(automatic)\n" +
+                  "1. Delete Book from database\n" +
+                  "2. Delete CD Music from database\n" +
+                  "3. Delete PC Game from database\n" +
+                  "4. Delete Personnel from database\n" +
+                  "5. Delete Client from database\n" +
+                  "6. Delete all data from tables in database\n" +
                   "7. Return to main menu\n" +
                   "Choose option:");
     return Console.ReadKey();
@@ -411,9 +395,9 @@ ConsoleKeyInfo DisplayMainMenu()
                       "*************************************************");
     Console.ForegroundColor = ConsoleColor.White;
     Console.Write("-----------Menu----------\n" +
-                  "1. Menu Adding Stuff\n" +
-                  "2. Menu Deleting Stuff\n" +
-                  "3. Display all repositories\n" +
+                  "1. Menu adding stuff to database\n" +
+                  "2. Menu deleting stuff to Database\n" +
+                  "3. Display all data from database\n" +
                   "4. Exit the application\n" +
                   "Choose option:");
     return Console.ReadKey();
@@ -449,9 +433,9 @@ bool AddBook()
         {
             date = "0";
         }
-
         sqlBooksRepository.Add(new Book { Title = title, Author = author, Genre = genre, ReleaseDate = int.Parse(date) });
         sqlBooksRepository.Save();
+
         return true;
     }
     else
@@ -528,7 +512,7 @@ bool AddPCGame()
         {
             date = "0";
         }
-
+     
         sqlPCGamesRepository.Add(new PCGame { Title = title, PEGI = int.Parse(pegiclass), Genre = genre, ReleaseDate = int.Parse(date) });
         sqlPCGamesRepository.Save();
         return true;
@@ -765,7 +749,7 @@ while (true)
                         {
                             AddBook();
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
                             ShowMessage("Incorrect Data! The object was not created.");
                         }

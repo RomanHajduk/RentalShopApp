@@ -1,5 +1,7 @@
-﻿namespace RentalShopApp.Entities
+﻿using Microsoft.EntityFrameworkCore;
+namespace RentalShopApp.Entities
 {
+    [PrimaryKey(nameof(Id))]
     public class CDMusic : EntityBase
     {
         public string BandName { get; set; }

@@ -1,4 +1,4 @@
-﻿using LibraryApp.Entities;
+﻿using RentalShopApp.Entities;
 using System.Text.Json;
 
 namespace RentalShopApp.Entities.Extensions
