@@ -17,7 +17,7 @@
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer("Data Source=PIRATEN-KOMP\\SQLEXPRESS;Initial Catalog=RentalShopStorage;Integrated Security=True;Encrypt=False;Trust Server Certificate=True");
+            optionsBuilder.UseSqlServer("Data Source=localhost\\SQLEXPRESS;Initial Catalog=RentalShopStorage;Integrated Security=True;Encrypt=False;Trust Server Certificate=True");
             
         }
          
