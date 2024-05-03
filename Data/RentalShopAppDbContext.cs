@@ -14,12 +14,12 @@
             Database.EnsureCreated();
             SaveChanges();
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public RentalShopAppDbContext(DbContextOptions<RentalShopAppDbContext> options) : base(options) 
         {
-            base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer("Data Source=localhost\\SQLEXPRESS;Initial Catalog=RentalShopStorage;Integrated Security=True;Encrypt=False;Trust Server Certificate=True");
-            
+            Database.EnsureCreated();
+            SaveChanges();
         }
+
          
     }
 }
