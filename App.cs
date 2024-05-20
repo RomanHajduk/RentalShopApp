@@ -1,39 +1,48 @@
-﻿using RentalShopApp.Repositories;
-using RentalShopApp.Entities;
+﻿using RentalShopApp.Services.Menu;
 
 namespace RentalShopApp
 {
     public class App : IApp
     {
-        private readonly IRepository<Book> _booksRepository;
-        private readonly IRepository<CDMusic> _cdsMusicRepository;
-        public App(IRepository<Book> bookRepository, IRepository<CDMusic> cdsMusicRepository)
+        
+        private readonly IMenu _menu;
+        public App (IMenu menu)
         {
-            _booksRepository = bookRepository;
-            _cdsMusicRepository = cdsMusicRepository;
+            _menu = menu;
         }
 
 
         public void Run()
         {
-
-            Console.WriteLine("A jednak działa");
-            //var books = new[]
+            _menu.ActionLoop();
+           
+            //var book = new Book();
+            //var propBook = _userCommunication.AddStuff(book);
+            //try
             //{
-            //    new Book { Title = "Krew elfów", Author = "Andrzej Sapkowski", Genre = "Fantasy", ReleaseDate = 1994 },
-            //    new Book { Title = "Potop", Author = "Henryk Sienkiewicz", Genre = "Powieść historyczna", ReleaseDate = 1886 },
-            //    new Book { Title = "Igła", Author = "Ken Follett", Genre = "Powieść wojenna", ReleaseDate = 1978 },
-            //    new Book { Title = "Akademia pana Kleksa", Author = "Jan Brzechwa", Genre = "Literatura dziecięca", ReleaseDate = 1946 },
-            //    new Book { Title = "Zakazana archeologia ", Author = "Michael Cremo", Genre = "Paranauka", ReleaseDate = 1998 }
-            //};
-            _cdsMusicRepository.Add(
-                new CDMusic { BandName = "Tristania", AlbumTitle = "Beyond The Veil", Genre = "Gothic Metal", ReleaseDate = 1999 });
-            //foreach (var book in books) 
-            //{ 
-            //    _booksRepository.Add(book);
+            //    foreach (var property in book.GetType().GetProperties())
+            //    {
+            //        foreach (var item in propBook)
+            //        {
+            //            if (property.Name == item.Key && property.PropertyType.Name == "String")
+            //                property.SetValue(book, item.Value);
+            //            if (property.Name == item.Key && property.PropertyType.Name == "Int32")
+            //                property.SetValue(book, Convert.ToInt32(item.Value));
+            //            if (property.Name == item.Key && property.PropertyType.Name == "Boolean")
+            //                property.SetValue(book, Convert.ToBoolean(item.Value));
+            //        }
+
+            //    }
+
+            // Console.WriteLine(book.ToString());
+            // //   _booksRepository.Add(book);
+            // //   _booksRepository.Save();
             //}
-            _cdsMusicRepository.Save();
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
+
         }
-    
     }
 }

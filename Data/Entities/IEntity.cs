@@ -1,4 +1,4 @@
-﻿namespace RentalShopApp.Entities
+﻿namespace RentalShopApp.Data.Entities
 {
     public interface IEntity
     {

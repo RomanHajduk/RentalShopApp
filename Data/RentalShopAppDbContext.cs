@@ -1,7 +1,8 @@
 ﻿namespace RentalShopApp.Data
 {
-    using RentalShopApp.Entities;
     using Microsoft.EntityFrameworkCore;
+    using RentalShopApp.Data.Entities;
+
     public class RentalShopAppDbContext: DbContext
     {
         public DbSet<Book> Books => Set<Book>();
@@ -9,13 +10,16 @@
         public DbSet<CDMusic> CDsMusic => Set<CDMusic>();
         public DbSet<Client> Clients => Set<Client>();
         public DbSet<Employee> Employees => Set<Employee>();
+      
         public RentalShopAppDbContext()
-        { 
+        {
+            
             Database.EnsureCreated();
             SaveChanges();
         }
         public RentalShopAppDbContext(DbContextOptions<RentalShopAppDbContext> options) : base(options) 
         {
+            
             Database.EnsureCreated();
             SaveChanges();
         }

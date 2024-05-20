@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace RentalShopApp.Entities
+namespace RentalShopApp.Data.Entities
 {
     [PrimaryKey(nameof(Id))]
-    public class Employee: EntityBase
+    public class Employee : EntityBase
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string TypeOfWork {  get; set; }
-        public int Age {  get; set; }
+        public string TypeOfWork { get; set; }
+        public int Age { get; set; }
         public override string ToString() => $"Id: {Id} FirstName: {FirstName} LastName: {LastName} TypeOfWork: {TypeOfWork} Age: {Age}";
-        public Employee() 
+        public Employee()
         {
             FirstName = "unknown";
             LastName = "unknown";

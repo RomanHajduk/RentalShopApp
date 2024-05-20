@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace RentalShopApp.Entities
+namespace RentalShopApp.Data.Entities
 {
     [PrimaryKey(nameof(Id))]
     public class Client : EntityBase
@@ -7,7 +7,7 @@ namespace RentalShopApp.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
-        public bool PremiumClient {  get; set; }
+        public bool PremiumClient { get; set; }
         public override string ToString() => $"Id: {Id} FirstName: {FirstName} LastName: {LastName} PremiumClient: {PremiumClient} Age: {Age}";
         public Client()
         {

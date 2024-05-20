@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace RentalShopApp.Entities
+namespace RentalShopApp.Data.Entities
 {
     [PrimaryKey(nameof(Id))]
     public class Book : EntityBase
@@ -12,7 +12,7 @@ namespace RentalShopApp.Entities
 
         public Book()
         {
-            
+
             Title = "unknown";
             Author = "unknown";
             Genre = "unknown";

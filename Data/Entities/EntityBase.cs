@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RentalShopApp.Entities
+namespace RentalShopApp.Data.Entities
 {
     public abstract class EntityBase : IEntity
     {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace RentalShopApp.Entities
+namespace RentalShopApp.Data.Entities
 {
     [PrimaryKey(nameof(Id))]
     public class CDMusic : EntityBase
@@ -19,8 +19,8 @@ namespace RentalShopApp.Entities
             ReleaseDate = 0;
         }
         public CDMusic(string band, string album, string genre, int reldate)
-        { 
-            BandName= band;
+        {
+            BandName = band;
             AlbumTitle = album;
             Genre = genre;
             ReleaseDate = reldate;

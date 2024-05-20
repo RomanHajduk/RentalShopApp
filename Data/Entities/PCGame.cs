@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace RentalShopApp.Entities
+namespace RentalShopApp.Data.Entities
 {
     [PrimaryKey(nameof(Id))]
-    public class PCGame: EntityBase
-    { 
+    public class PCGame : EntityBase
+    {
         public string Title { get; set; }
         public int ReleaseDate { get; set; }
         public string Genre { get; set; }
