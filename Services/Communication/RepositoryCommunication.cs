@@ -1,48 +1,34 @@
-﻿namespace RentalShopApp.Services.UserCommunication
+﻿using RentalShopApp.Components.CSVReader;
+using RentalShopApp.Data.Entities;
+using RentalShopApp.Data.Repositories;
+using RentalShopApp.Data.Repositories.Extensions;
+using RentalShopApp.Services.Events;
+using System.Text.RegularExpressions;
+
+
+namespace RentalShopApp.Services.UserCommunication
 {
-    using System;
-    using System.Collections.Generic;
-    using Microsoft.EntityFrameworkCore.Metadata.Internal;
-    using System.Resources;
-    using RentalShopApp.Components.CSVReader;
-    using RentalShopApp.Components.DataProviders;
-    using RentalShopApp.Data.Entities;
-    using RentalShopApp.Data.Repositories;
-    using RentalShopApp.Services.Events;
-
-    public class UserCommunication : IUserCommunication
+    public class RepositoryCommunication: IRepositoryCommunication
     {
-
         private readonly IRepository<Book> _booksRepository;
         private readonly IRepository<CDMusic> _cdsMusicRepository;
         private readonly IRepository<PCGame> _pcGamesRepository;
         private readonly IRepository<Employee> _employeesRepository;
         private readonly IRepository<Client> _clientsRepository;
-        private readonly IBooksProvider _booksProvider;
-        private readonly ICDsMusicProvider _cdsMusicProvider;
-        private readonly IPCGamesProvider _pcGamesProvider;
-        private readonly IEmployeesProvider _employeesProvider;
-        private readonly IClientsProvider _clientsProvider;
-        private readonly ICSVReader _CSVReader;
         private readonly IEventsMethods _eventsMethods;
-        public UserCommunication(IRepository<Book> booksRepository, IRepository<CDMusic> cdsMusicRepository,
+        private readonly ICSVReader _CSVReader;
+        public RepositoryCommunication(IRepository<Book> booksRepository, IRepository<CDMusic> cdsMusicRepository,
                    IRepository<PCGame> pcGamesRepository, IRepository<Employee> employeeRepository,
-                    IRepository<Client> clientsRepository, IBooksProvider booksProvider, ICDsMusicProvider cdsMusicProvider,
-                    IPCGamesProvider pcGamesProvider, IEmployeesProvider employeesProvider, IClientsProvider clientProvider,ICSVReader cSVReader,
-                    IEventsMethods eventsMethods)
+                    IRepository<Client> clientsRepository,IEventsMethods eventsMethods,ICSVReader cSVReader)
         {
             _booksRepository = booksRepository;
             _cdsMusicRepository = cdsMusicRepository;
             _pcGamesRepository = pcGamesRepository;
             _employeesRepository = employeeRepository;
             _clientsRepository = clientsRepository;
-            _booksProvider = booksProvider;
-            _cdsMusicProvider = cdsMusicProvider;
-            _pcGamesProvider = pcGamesProvider;
-            _employeesProvider = employeesProvider;
-            _clientsProvider = clientProvider;
             _CSVReader = cSVReader;
             _eventsMethods = eventsMethods;
+            
             _booksRepository.ItemAdded += _eventsMethods.ItemAdded;
             _cdsMusicRepository.ItemAdded += _eventsMethods.ItemAdded;
             _pcGamesRepository.ItemAdded += _eventsMethods.ItemAdded;
@@ -57,7 +43,7 @@
 
         public void AddStuff<T>(T nameclass)
         {
-            
+
             var obj = nameclass;
             Console.Clear();
             Console.WriteLine($"Adding {typeof(T).Name}");
@@ -71,10 +57,13 @@
                     propertiesObject.Add(property.Name, valueProperty);
                 }
             }
+            int emptystring = 0;
             for (int i = 0; i < propertiesObject.Count; i++)
             {
+                
                 if (propertiesObject.ElementAt(i).Value == "")
                 {
+                    emptystring++;    
                     switch (propertiesObject.ElementAt(i).Key)
                     {
                         case "PEGI":
@@ -89,15 +78,40 @@
                             propertiesObject.Remove(propertiesObject.ElementAt(i).Key);
                             propertiesObject.Add(key, "false");
                             break;
-                        default:
-                            key = propertiesObject.ElementAt(i).Key;
-                            propertiesObject.Remove(propertiesObject.ElementAt(i).Key);
-                            propertiesObject.Add(key, "unknown");
-                            break;
+                    }
+                    if (emptystring == propertiesObject.Count)
+                    {
+                        throw new Exception("All values is empty!");
                     }
                 }
+               
                 switch (propertiesObject.ElementAt(i).Key)
                 {
+                    case "TypeOfWork":
+                        if (!propertiesObject.ElementAt(i).Value.All(c => char.IsLetter(c) || c == ' '))
+                        {
+                            throw new Exception($"This string {propertiesObject.ElementAt(i).Key} can only contain letters and whitespaces!");
+                        }
+                        break;
+                    case "FirstName":
+                        if (!propertiesObject.ElementAt(i).Value.All(c => char.IsLetter(c)))
+                        {
+                            throw new Exception($"This string {propertiesObject.ElementAt(i).Key} can only contain letters!");
+                        }
+                        break;
+                    case "LastName":
+                        if (!propertiesObject.ElementAt(i).Value.All(c => char.IsLetter(c) || c == '-'))
+                        {
+                            throw new Exception($"This string {propertiesObject.ElementAt(i).Key} can only contain letters and dash sign!");
+                        }
+                        break;
+                    case "Genre":
+                    case "Author":    
+                        if (!propertiesObject.ElementAt(i).Value.All(c => char.IsLetter(c) || c == ' ' || c == '-'))
+                        {
+                            throw new Exception($"This string {propertiesObject.ElementAt(i).Key} can only contain letters, whitespaces and dash sign!");
+                        }
+                        break;
                     case "PEGI":
                     case "Age":
                     case "ReleaseDate":
@@ -126,15 +140,21 @@
                         property.SetValue(obj, Convert.ToBoolean(item.Value));
                 }
             }
-            foreach (var item in obj.GetType().GetProperties())
+            foreach (var property in obj.GetType().GetProperties())
             {
-                Console.WriteLine($"{item.Name} {item.PropertyType.Name} {item.GetValue(obj)} ");
+
+                    if (property.PropertyType.Name == "String" &&
+                        (obj.GetType().GetProperty(property.Name).GetValue(obj) == ""))
+                    {
+                    throw new Exception("This value can be empty:" + property.Name);
+                    }
             }
             switch (obj.GetType().Name)
             {
                 case "Book":
                     Book book = obj as Book;
                     _booksRepository.Add(book);
+                    
                     _booksRepository.Save();
                     break;
                 case "CDMusic":
@@ -172,6 +192,10 @@
                     {
                         Console.WriteLine(item);
                     }
+                    if(_booksRepository.GetAll().ToList().Count == 0)
+                    {
+                        throw new Exception("Database is empty!");
+                    }
                     Console.Write("Enter ID Book to remove:");
                     var idbook = Console.ReadLine();
                     int ID;
@@ -208,6 +232,10 @@
                     {
                         Console.WriteLine(item);
                     }
+                    if (_cdsMusicRepository.GetAll().ToList().Count == 0)
+                    {
+                        throw new Exception("Database is empty!");
+                    }
                     Console.Write("Enter ID CD Music to remove:");
                     var idcdmusic = Console.ReadLine();
                     if (idcdmusic == "")
@@ -242,6 +270,10 @@
                     foreach (var item in _pcGamesRepository.GetAll())
                     {
                         Console.WriteLine(item);
+                    }
+                    if (_pcGamesRepository.GetAll().ToList().Count == 0)
+                    {
+                        throw new Exception("Database is empty");
                     }
                     Console.Write("Enter ID PC Game to remove:");
                     var idpcgame = Console.ReadLine();
@@ -278,6 +310,10 @@
                     {
                         Console.WriteLine(item);
                     }
+                    if (_employeesRepository.GetAll().ToList().Count == 0)
+                    {
+                        throw new Exception("Database is empty");
+                    }
                     Console.Write("Enter ID Employee to remove:");
                     var idemployee = Console.ReadLine();
                     if (idemployee == "")
@@ -312,6 +348,10 @@
                     foreach (var item in _clientsRepository.GetAll())
                     {
                         Console.WriteLine(item);
+                    }
+                    if (_clientsRepository.GetAll().ToList().Count == 0)
+                    {
+                        throw new Exception("Database is empty");
                     }
                     Console.Write("Enter ID Client to remove:");
                     var idclient = Console.ReadLine();
@@ -349,18 +389,90 @@
         }
         public void AddAllStuff()
         {
-            var listBooksFromFile = _CSVReader.ProcessBook(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\katalog książek.csv");
-            if (listBooksFromFile.Count == 0)
+            try
             {
-                DisplayErrorMessage("List of books is empty");
-            }
-            else 
-            {
-                foreach (var item in listBooksFromFile)
+                var listBooksFromFile = _CSVReader.ProcessBook(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\katalog książek.csv");
+                if (listBooksFromFile.Count == 0)
                 {
-                    _booksRepository.Add(item);
+                    DisplayErrorMessage("Cannot add books to database because list of books is empty or file katalog książek.csv not exists!!!");
                 }
-                _booksRepository.Save();
+                else
+                {
+                    _booksRepository.AddBatch(listBooksFromFile.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                DisplayErrorMessage($"{ex.Message}");
+            }
+            
+            try
+            {
+                var listCDsMusicFromFile = _CSVReader.ProcessCDMusic(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\katalog płyt.csv");
+                if (listCDsMusicFromFile.Count == 0)
+                {
+                    DisplayErrorMessage("Cannot add CDs to database because list of CDs is empty or file katalog płyt.csv not exists!!!");
+                }
+                else
+                {
+                    _cdsMusicRepository.AddBatch(listCDsMusicFromFile.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                DisplayErrorMessage($"{ex.Message}");
+            }
+            try
+            {
+                var listPCGamesFromFile = _CSVReader.ProcessPCGame(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\katalog gier.csv");
+                if (listPCGamesFromFile.Count == 0)
+                {
+                    DisplayErrorMessage("Cannot add PC games to database because list of PC games is empty or file katalog gier.csv not exists!!!");
+                }
+                else
+                {
+                    _pcGamesRepository.AddBatch(listPCGamesFromFile.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                DisplayErrorMessage($"{ex.Message}");
+            }
+
+            try
+            {
+                var listEmployeesFromFile = _CSVReader.ProcessEmployee(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\lista pracowników.csv");
+                if (listEmployeesFromFile.Count == 0)
+                {
+                    DisplayErrorMessage("Cannot add employees to database because list of employees is empty or file lista pracowników.csv not exists!!!");
+                }
+                else
+                {
+                    _employeesRepository.AddBatch(listEmployeesFromFile.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                DisplayErrorMessage($"{ex.Message}");
+            }
+                
+            
+            
+           try
+            {
+                var listClientsFromFile = _CSVReader.ProcessClient(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\lista klientów.csv");
+                if (listClientsFromFile.Count == 0)
+                {
+                    DisplayErrorMessage("Cannot add clients to database because list of clients is empty or file lista klientów.csv not exists!!!");
+                }
+                else
+                {
+                    _clientsRepository.AddBatch(listClientsFromFile.ToArray());
+                }
+            }
+            catch(Exception ex) 
+            { 
+                DisplayErrorMessage($"{ex.Message}");
             }
             DisplayContinueInfo();
         }
@@ -371,6 +483,7 @@
                 foreach (Book item in _booksRepository.GetAll())
                 {
                     _booksRepository.Remove(item);
+                    _booksRepository.Save();
                 }
             }
             else
@@ -382,6 +495,7 @@
                 foreach (CDMusic item in _cdsMusicRepository.GetAll())
                 {
                     _cdsMusicRepository.Remove(item);
+                    _cdsMusicRepository.Save();
                 }
             }
             else
@@ -393,6 +507,7 @@
                 foreach (PCGame item in _pcGamesRepository.GetAll())
                 {
                     _pcGamesRepository.Remove(item);
+                    _pcGamesRepository.Save();
                 }
             }
             else
@@ -404,6 +519,7 @@
                 foreach (Employee item in _employeesRepository.GetAll())
                 {
                     _employeesRepository.Remove(item);
+                    _employeesRepository.Save();
                 }
             }
             else
@@ -415,6 +531,7 @@
                 foreach (Client item in _clientsRepository.GetAll())
                 {
                     _clientsRepository.Remove(item);
+                    _clientsRepository.Save();
                 }
             }
             else
@@ -423,339 +540,8 @@
             }
             DisplayContinueInfo();
         }
-        public void FindBookBy()
-        {
-            DisplayInfo("Menu Find Book by");
-            Console.WriteLine("1. Author");
-            Console.WriteLine("2. Genre");
-            Console.WriteLine("3. Title");
-            var choice = GetUserChoice();
-            switch (choice.Key)
-            {
-                case ConsoleKey.D1:
-                case ConsoleKey.NumPad1:
-                    Console.Write("Enter book author:");
-                    var author = Console.ReadLine();
-                    if (author != null || author != "")
-                    {
-                        var fbooks = _booksProvider.GetBooksByAuthor(author);
 
-                        foreach (var item in fbooks)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D2:
-                case ConsoleKey.NumPad2:
-                    Console.Write("Enter the genre:");
-                    var genre = Console.ReadLine();
-                    if (genre != null || genre != "")
-                    {
-                        var fbooks = _booksProvider.GetBooksByGenre(genre);
-
-                        foreach (var item in fbooks)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D3:
-                case ConsoleKey.NumPad3:
-                    Console.Write("Enter the title:");
-                    var title = Console.ReadLine();
-                    if (title != null || title != "")
-                    {
-                        var fbooks = _booksProvider.GetBooksByGenre(title);
-
-                        foreach (var item in fbooks)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                default:
-                    FindBookBy();
-                    break;
-            }
-            DisplayContinueInfo();
-        }
-        public void FindCDMusicBy()
-        {
-            DisplayInfo("Menu Find CD Music by");
-            Console.WriteLine("1. BandName");
-            Console.WriteLine("2. Genre");
-            Console.WriteLine("3. Album Title");
-            var choice = GetUserChoice();
-            switch (choice.Key)
-            {
-                case ConsoleKey.D1:
-                case ConsoleKey.NumPad1:
-                    Console.Write("Enter Bandname:");
-                    var band = Console.ReadLine();
-                    if (band != null || band != "")
-                    {
-                        var fcdsMusic = _cdsMusicProvider.GetCDsMusicByBandName(band);
-
-                        foreach (var item in fcdsMusic)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D2:
-                case ConsoleKey.NumPad2:
-                    Console.Write("Enter the genre:");
-                    var genre = Console.ReadLine();
-                    if (genre != null || genre != "")
-                    {
-                        var fcdsMusic = _cdsMusicProvider.GetCDsMusicByGenre(genre);
-
-                        foreach (var item in fcdsMusic)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D3:
-                case ConsoleKey.NumPad3:
-                    Console.Write("Enter the album title:");
-                    var title = Console.ReadLine();
-                    if (title != null || title != "")
-                    {
-                        var fcdsMusic = _cdsMusicProvider.GetCDsMusicByAlbumTitle(title);
-
-                        foreach (var item in fcdsMusic)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                default:
-                    FindCDMusicBy();
-                    break;
-            }
-            DisplayContinueInfo();
-        }
-        public void FindPCGameBy()
-        {
-            DisplayInfo("Menu Find PCGame by");
-            Console.WriteLine("1. Title");
-            Console.WriteLine("2. Genre");
-            Console.WriteLine("3. PEGI");
-            var choice = GetUserChoice();
-            switch (choice.Key)
-            {
-                case ConsoleKey.D1:
-                case ConsoleKey.NumPad1:
-                    Console.Write("Enter the game title:");
-                    var title = Console.ReadLine();
-                    if (title != null || title != "")
-                    {
-                        var fpcGames = _pcGamesProvider.GetPCGamesByGameTitle(title);
-
-                        foreach (var item in fpcGames)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D2:
-                case ConsoleKey.NumPad2:
-                    Console.Write("Enter the genre:");
-                    var genre = Console.ReadLine();
-                    if (genre != null || genre != "")
-                    {
-                        var fpcGames = _pcGamesProvider.GetPCGamesByGenre(genre);
-
-                        foreach (var item in fpcGames)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D3:
-                case ConsoleKey.NumPad3:
-                    Console.Write("Enter the age for PEGI:");
-                    var strage = Console.ReadLine();
-                    int age;
-                    int.TryParse(strage, out age);
-                    if (age != 0)
-                    {
-                        var fpcGames = _pcGamesProvider.GetPCGamesByPEGI(age);
-
-                        foreach (var item in fpcGames)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                default:
-                    FindPCGameBy();
-                    break;
-            }
-            DisplayContinueInfo();
-        }
-        public void FindEmployeeBy()
-        {
-            DisplayInfo("Menu Find Employee by");
-            Console.WriteLine("1. FirstName");
-            Console.WriteLine("2. LastName");
-            Console.WriteLine("3. Type of work");
-            Console.WriteLine("4. Age");
-            var choice = GetUserChoice();
-            switch (choice.Key)
-            {
-                case ConsoleKey.D1:
-                case ConsoleKey.NumPad1:
-                    Console.Write("Enter the firstname employee:");
-                    var firstname = Console.ReadLine();
-                    if (firstname != null || firstname != "")
-                    {
-                        var fEmployees = _employeesProvider.GetEmployeeByFirstName(firstname);
-
-                        foreach (var item in fEmployees)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D2:
-                case ConsoleKey.NumPad2:
-                    Console.Write("Enter the lastname employee:");
-                    var lastname = Console.ReadLine();
-                    if (lastname != null || lastname != "")
-                    {
-                        var fEmployees = _employeesProvider.GetEmployeeByLastName(lastname);
-
-                        foreach (var item in fEmployees)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D3:
-                case ConsoleKey.NumPad3:
-                    Console.Write("Enter the type of work:");
-                    var typeofwork = Console.ReadLine();
-                    if (typeofwork != null || typeofwork != "")
-                    {
-                        var fEmployees = _employeesProvider.GetEmployeeByWorkType(typeofwork);
-
-                        foreach (var item in fEmployees)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D4:
-                case ConsoleKey.NumPad4:
-                    Console.Write("Enter the age of employee:");
-                    var strage = Console.ReadLine();
-                    int age;
-                    int.TryParse(strage, out age);
-                    if (age != 0)
-                    {
-                        var fEmployees = _employeesProvider.GetEmployeeByAge(age);
-
-                        foreach (var item in fEmployees)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                default:
-                    FindEmployeeBy();
-                    break;
-            }
-            DisplayContinueInfo();
-        }
-        public void FindClientBy()
-        {
-            DisplayInfo("Menu Find Client by");
-            Console.WriteLine("1. FirstName");
-            Console.WriteLine("2. LastName");
-            Console.WriteLine("3. Premium");
-            Console.WriteLine("4. Age");
-            var choice = GetUserChoice();
-            switch (choice.Key)
-            {
-                case ConsoleKey.D1:
-                case ConsoleKey.NumPad1:
-                    Console.Write("Enter the firstname client:");
-                    var firstname = Console.ReadLine();
-                    if (firstname != null || firstname != "")
-                    {
-                        var fClients = _clientsProvider.GetClientByFirstName(firstname);
-
-                        foreach (var item in fClients)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D2:
-                case ConsoleKey.NumPad2:
-                    Console.Write("Enter the lastname client:");
-                    var lastname = Console.ReadLine();
-                    if (lastname != null || lastname != "")
-                    {
-                        var fClients = _clientsProvider.GetClientByLastName(lastname);
-
-                        foreach (var item in fClients)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                case ConsoleKey.D3:
-                case ConsoleKey.NumPad3:
-                    Console.Write("Enter the PremiumClient((Y)es or (No)):");
-                    var premium = Console.ReadLine();
-                    if (premium != null || premium != "")
-                    {
-                        if (premium.ToLower() == "y" || premium.ToLower() == "n")
-                        {
-                            var fClients = _clientsProvider.GetClientByPremium(premium.ToLower() == "y" ? true : false);
-                            foreach (var item in fClients)
-                            {
-                                Console.WriteLine(item);
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("Given value is not correct");
-                        }
-                    }
-                    break;
-                case ConsoleKey.D4:
-                case ConsoleKey.NumPad4:
-                    Console.Write("Enter the age of client:");
-                    var strage = Console.ReadLine();
-                    int age;
-                    int.TryParse(strage, out age);
-                    if (age != 0)
-                    {
-                        var fClients = _clientsProvider.GetClientByAge(age);
-
-                        foreach (var item in fClients)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
-                    break;
-                default:
-                    FindClientBy();
-                    break;
-            }
-            DisplayContinueInfo();
-        }
-        private void DisplayContinueInfo()
-        {
-            Console.WriteLine("Please any key to continue..");
-            Console.ReadKey();
-        }
-        public void DisplayDataFromBooksRepository()
+        public void DisplayAllDataFromDatabase()
         {
             DisplayInfo("List of books from database:");
             if (_booksRepository.GetAll().ToList().Count > 0)
@@ -765,15 +551,12 @@
                     Console.WriteLine(item);
                 }
                 DisplayInfo("");
-            }       
+            }
             else
             {
                 DisplayErrorMessage("List of books is empty!");
             }
             Console.WriteLine();
-        }
-        public void DisplayDataFromCdsMusicRepository()
-        {
             DisplayInfo("List of cds music from database:");
             if (_cdsMusicRepository.GetAll().ToList().Count > 0)
             {
@@ -788,9 +571,6 @@
                 DisplayErrorMessage("List of cds music is empty!");
             }
             Console.WriteLine();
-        }
-        public void DisplayDataFromPCGamesRepository()
-        {
             DisplayInfo("List of pc games from database:");
             if (_pcGamesRepository.GetAll().ToList().Count > 0)
             {
@@ -805,9 +585,6 @@
                 DisplayErrorMessage("List of pc games is empty!");
             }
             Console.WriteLine();
-        }
-        public void DisplayDataFromEmployeesRepository()
-        {
             DisplayInfo("List of personnel from database:");
             if (_employeesRepository.GetAll().ToList().Count > 0)
             {
@@ -822,9 +599,6 @@
                 DisplayErrorMessage("List of personnel is empty!");
             }
             Console.WriteLine();
-        }
-        public void DisplayDataFromClientRepository()
-        {
             DisplayInfo("List of clients from database:");
             if (_clientsRepository.GetAll().ToList().Count > 0)
             {
@@ -838,25 +612,8 @@
             {
                 DisplayErrorMessage("List of clients is empty!");
             }
-            Console.WriteLine();
-        }
-        public void DisplayAllDataFromDatabase()
-        {
-            DisplayDataFromBooksRepository();
-            DisplayDataFromCdsMusicRepository();
-            DisplayDataFromPCGamesRepository();
-            DisplayDataFromEmployeesRepository();
-            DisplayDataFromClientRepository();
             DisplayContinueInfo();
         }
-        public void DisplayErrorMessage(string message)
-        {
-            Console.SetCursorPosition(0, Console.GetCursorPosition().Top);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
         public void DisplayInfo(string message)
         {
             Console.SetCursorPosition(0, Console.GetCursorPosition().Top);
@@ -874,16 +631,17 @@
             }
             Console.ForegroundColor = ConsoleColor.White;
         }
-
-
-        public ConsoleKeyInfo GetUserChoice()
+        public void DisplayContinueInfo()
         {
-            Console.Write("Choose option:");
-            return Console.ReadKey();
+            Console.WriteLine("Please any key to continue..");
+            Console.ReadKey();
         }
-
-
-
-
+        public void DisplayErrorMessage(string message)
+        {
+            Console.SetCursorPosition(0, Console.GetCursorPosition().Top);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
     }
 }

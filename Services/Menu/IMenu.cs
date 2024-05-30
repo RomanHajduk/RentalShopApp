@@ -7,6 +7,7 @@
         void DisplaySubMenuRemovingStuff();
         void DisplayMenu(string namemenu, string[] arrayoflistofchoice);
         void ActionLoop();
+        ConsoleKeyInfo GetUserChoice();
 
     }
 }

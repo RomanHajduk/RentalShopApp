@@ -16,4 +16,19 @@
     <PackageReference Include="Microsoft.Identity.Client" Version="4.60.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\Files\katalog książek.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\katalog płyt.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\lista klientów.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\lista pracowników.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

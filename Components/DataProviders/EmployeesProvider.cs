@@ -19,19 +19,19 @@ namespace RentalShopApp.Components.DataProviders
 
         public List<Employee> GetEmployeeByFirstName(string firstname)
         {
-            var filteredEmployees = _employeesRepository.GetAll().Where(employee => employee.FirstName == firstname);
+            var filteredEmployees = _employeesRepository.GetAll().Where(employee => employee.FirstName.ToLower() == firstname.ToLower());
             return filteredEmployees.ToList();
         }
 
         public List<Employee> GetEmployeeByLastName(string lastname)
         {
-            var filteredEmployees = _employeesRepository.GetAll().Where(employee => employee.LastName == lastname);
+            var filteredEmployees = _employeesRepository.GetAll().Where(employee => employee.LastName.ToLower() == lastname.ToLower());
             return filteredEmployees.ToList();
         }
 
         public List<Employee> GetEmployeeByWorkType(string typeofwork)
         {
-            var filteredEmployees = _employeesRepository.GetAll().Where(employee => employee.TypeOfWork == typeofwork);
+            var filteredEmployees = _employeesRepository.GetAll().Where(employee => employee.TypeOfWork.ToLower() == typeofwork.ToLower());
             return filteredEmployees.ToList();
         }
     }

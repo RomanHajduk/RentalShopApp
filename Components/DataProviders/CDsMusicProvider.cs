@@ -12,19 +12,19 @@ namespace RentalShopApp.Components.DataProviders
         }
         public List<CDMusic> GetCDsMusicByAlbumTitle(string title)
         {
-            var filteredcdsMusic = _cdsMusicRepository.GetAll().Where(cdmusic => cdmusic.AlbumTitle == title);
+            var filteredcdsMusic = _cdsMusicRepository.GetAll().Where(cdmusic => cdmusic.AlbumTitle.ToLower() == title.ToLower());
             return filteredcdsMusic.ToList();
         }
 
         public List<CDMusic> GetCDsMusicByBandName(string bandname)
         {
-            var filteredcdsMusic = _cdsMusicRepository.GetAll().Where(cdmusic => cdmusic.BandName == bandname);
+            var filteredcdsMusic = _cdsMusicRepository.GetAll().Where(cdmusic => cdmusic.BandName.ToLower() == bandname.ToLower());
             return filteredcdsMusic.ToList();
         }
 
         public List<CDMusic> GetCDsMusicByGenre(string genre)
         {
-            var filteredcdsMusic = _cdsMusicRepository.GetAll().Where(cdmusic => cdmusic.Genre == genre);
+            var filteredcdsMusic = _cdsMusicRepository.GetAll().Where(cdmusic => cdmusic.Genre.ToLower() == genre.ToLower());
             return filteredcdsMusic.ToList();
         }
     }

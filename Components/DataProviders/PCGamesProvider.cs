@@ -12,13 +12,13 @@ namespace RentalShopApp.Components.DataProviders
         }
         public List<PCGame> GetPCGamesByGameTitle(string title)
         {
-            var filteredPCGames = _pcGamesRepository.GetAll().Where(pcgame => pcgame.Title == title);
+            var filteredPCGames = _pcGamesRepository.GetAll().Where(pcgame => pcgame.Title.ToLower() == title.ToLower());
             return filteredPCGames.ToList();
         }
 
         public List<PCGame> GetPCGamesByGenre(string genre)
         {
-            var filteredPCGames = _pcGamesRepository.GetAll().Where(pcgame => pcgame.Genre == genre);
+            var filteredPCGames = _pcGamesRepository.GetAll().Where(pcgame => pcgame.Genre.ToLower() == genre.ToLower());
             return filteredPCGames.ToList();
         }
         public List<PCGame> GetPCGamesByPEGI(int age)

@@ -19,13 +19,13 @@ namespace RentalShopApp.Components.DataProviders
 
         public List<Client> GetClientByFirstName(string firstname)
         {
-            var filteredClients = _clientsRepository.GetAll().Where(client => client.FirstName == firstname);
+            var filteredClients = _clientsRepository.GetAll().Where(client => client.FirstName.ToLower() == firstname.ToLower());
             return filteredClients.ToList();
         }
 
         public List<Client> GetClientByLastName(string lastname)
         {
-            var filteredClients = _clientsRepository.GetAll().Where(client => client.LastName == lastname);
+            var filteredClients = _clientsRepository.GetAll().Where(client => client.LastName.ToLower() == lastname.ToLower());
             return filteredClients.ToList();
         }
 
