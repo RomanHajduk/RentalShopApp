@@ -187,7 +187,7 @@ namespace RentalShopApp.Services.UserCommunication
             switch (typeof(T).Name)
             {
                 case "Book":
-                    DisplayInfo("List of books in the database");
+                    DisplayInfo("book list in the database:");
                     foreach (var item in _booksRepository.GetAll())
                     {
                         Console.WriteLine(item);
@@ -196,7 +196,7 @@ namespace RentalShopApp.Services.UserCommunication
                     {
                         throw new Exception("Database is empty!");
                     }
-                    Console.Write("Enter ID Book to remove:");
+                    Console.Write("Enter book ID to remove:");
                     var idbook = Console.ReadLine();
                     int ID;
                     if (idbook == "")
@@ -223,11 +223,11 @@ namespace RentalShopApp.Services.UserCommunication
                     }
                     if (!exists)
                     {
-                        throw new Exception("Given ID Book not exists in repository!");
+                        throw new Exception("Given book ID not exists in database!");
                     }
                     break;
                 case "CDMusic":
-                    DisplayInfo("List of music cds in the database:");
+                    DisplayInfo("CDs music list in the database:");
                     foreach (var item in _cdsMusicRepository.GetAll())
                     {
                         Console.WriteLine(item);
@@ -236,7 +236,7 @@ namespace RentalShopApp.Services.UserCommunication
                     {
                         throw new Exception("Database is empty!");
                     }
-                    Console.Write("Enter ID CD Music to remove:");
+                    Console.Write("Enter CD music ID to remove:");
                     var idcdmusic = Console.ReadLine();
                     if (idcdmusic == "")
                     {
@@ -262,11 +262,11 @@ namespace RentalShopApp.Services.UserCommunication
                     }
                     if (!exists)
                     {
-                        throw new Exception("Given ID CD Music not exists in repository!");
+                        throw new Exception("Given CD music ID not exists in database!");
                     }
                     break;
                 case "PCGame":
-                    DisplayInfo("Pc games list in database");
+                    DisplayInfo("PC games list in database:");
                     foreach (var item in _pcGamesRepository.GetAll())
                     {
                         Console.WriteLine(item);
@@ -275,7 +275,7 @@ namespace RentalShopApp.Services.UserCommunication
                     {
                         throw new Exception("Database is empty");
                     }
-                    Console.Write("Enter ID PC Game to remove:");
+                    Console.Write("Enter PC game ID to remove:");
                     var idpcgame = Console.ReadLine();
                     if (idpcgame == "")
                     {
@@ -301,11 +301,11 @@ namespace RentalShopApp.Services.UserCommunication
                     }
                     if (!exists)
                     {
-                        throw new Exception("Given ID PC Game not exists in repository!");
+                        throw new Exception("Given PC game ID not exists in database!");
                     }
                     break;
                 case "Employee":
-                    DisplayInfo("List of personnel in the database");
+                    DisplayInfo("Personnel list in the database:");
                     foreach (var item in _employeesRepository.GetAll())
                     {
                         Console.WriteLine(item);
@@ -314,7 +314,7 @@ namespace RentalShopApp.Services.UserCommunication
                     {
                         throw new Exception("Database is empty");
                     }
-                    Console.Write("Enter ID Employee to remove:");
+                    Console.Write("Enter employee ID to remove:");
                     var idemployee = Console.ReadLine();
                     if (idemployee == "")
                     {
@@ -340,11 +340,11 @@ namespace RentalShopApp.Services.UserCommunication
                     }
                     if (!exists)
                     {
-                        throw new Exception("Given ID Employee not exists in repository!");
+                        throw new Exception("Given employee id not exists in database!");
                     }
                     break;
                 case "Client":
-                    DisplayInfo("List of clients in database");
+                    DisplayInfo("Clients list in database:");
                     foreach (var item in _clientsRepository.GetAll())
                     {
                         Console.WriteLine(item);
@@ -353,7 +353,7 @@ namespace RentalShopApp.Services.UserCommunication
                     {
                         throw new Exception("Database is empty");
                     }
-                    Console.Write("Enter ID Client to remove:");
+                    Console.Write("Enter client ID to remove:");
                     var idclient = Console.ReadLine();
                     if (idclient == "")
                     {
@@ -379,7 +379,7 @@ namespace RentalShopApp.Services.UserCommunication
                     }
                     if (!exists)
                     {
-                        throw new Exception("Given ID Client not exists in repository!");
+                        throw new Exception("Given client id not exists in database!");
                     }
                     break;
                 default:
@@ -391,10 +391,10 @@ namespace RentalShopApp.Services.UserCommunication
         {
             try
             {
-                var listBooksFromFile = _CSVReader.ProcessBook(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\katalog książek.csv");
+                var listBooksFromFile = _CSVReader.ProcessBook(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\book list.csv");
                 if (listBooksFromFile.Count == 0)
                 {
-                    DisplayErrorMessage("Cannot add books to database because list of books is empty or file katalog książek.csv not exists!!!");
+                    DisplayErrorMessage("Cannot add books to database because book list is empty or file book list.csv not exists!!!");
                 }
                 else
                 {
@@ -408,10 +408,10 @@ namespace RentalShopApp.Services.UserCommunication
             
             try
             {
-                var listCDsMusicFromFile = _CSVReader.ProcessCDMusic(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\katalog płyt.csv");
+                var listCDsMusicFromFile = _CSVReader.ProcessCDMusic(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\cds album list.csv");
                 if (listCDsMusicFromFile.Count == 0)
                 {
-                    DisplayErrorMessage("Cannot add CDs to database because list of CDs is empty or file katalog płyt.csv not exists!!!");
+                    DisplayErrorMessage("Cannot add CDs to database because CDs music list is empty or file cds album list.csv not exists!!!");
                 }
                 else
                 {
@@ -424,10 +424,10 @@ namespace RentalShopApp.Services.UserCommunication
             }
             try
             {
-                var listPCGamesFromFile = _CSVReader.ProcessPCGame(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\katalog gier.csv");
+                var listPCGamesFromFile = _CSVReader.ProcessPCGame(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\pc games list.csv");
                 if (listPCGamesFromFile.Count == 0)
                 {
-                    DisplayErrorMessage("Cannot add PC games to database because list of PC games is empty or file katalog gier.csv not exists!!!");
+                    DisplayErrorMessage("Cannot add PC games to database because PC games list is empty or file pc games list.csv not exists!!!");
                 }
                 else
                 {
@@ -441,10 +441,10 @@ namespace RentalShopApp.Services.UserCommunication
 
             try
             {
-                var listEmployeesFromFile = _CSVReader.ProcessEmployee(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\lista pracowników.csv");
+                var listEmployeesFromFile = _CSVReader.ProcessEmployee(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\employees list.csv");
                 if (listEmployeesFromFile.Count == 0)
                 {
-                    DisplayErrorMessage("Cannot add employees to database because list of employees is empty or file lista pracowników.csv not exists!!!");
+                    DisplayErrorMessage("Cannot add employees to database because employees list is empty or file employees list.csv not exists!!!");
                 }
                 else
                 {
@@ -460,10 +460,10 @@ namespace RentalShopApp.Services.UserCommunication
             
            try
             {
-                var listClientsFromFile = _CSVReader.ProcessClient(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\lista klientów.csv");
+                var listClientsFromFile = _CSVReader.ProcessClient(@"D:\Projekty Visual Studio\RentalShopApp\RentalShopApp\Resources\Files\clients list.csv");
                 if (listClientsFromFile.Count == 0)
                 {
-                    DisplayErrorMessage("Cannot add clients to database because list of clients is empty or file lista klientów.csv not exists!!!");
+                    DisplayErrorMessage("Cannot add clients to database because clients list is empty or file clients list.csv not exists!!!");
                 }
                 else
                 {
@@ -488,7 +488,7 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayInfo("List of books in database not exists.");
+                DisplayInfo("Book list in database not exists.");
             }
             if (_cdsMusicRepository.GetAll().Count() != 0)
             {
@@ -500,7 +500,7 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayInfo("List of cds music in database not exists.");
+                DisplayInfo("Cds music list in database not exists.");
             }
             if (_pcGamesRepository.GetAll().Count() != 0)
             {
@@ -512,7 +512,7 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayInfo("List of pc games in database not exists.");
+                DisplayInfo("PC games list in database not exists.");
             }
             if (_employeesRepository.GetAll().Count() != 0)
             {
@@ -524,7 +524,7 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayInfo("List of employees in database not exists.");
+                DisplayInfo("Employees list in database not exists.");
             }
             if (_clientsRepository.GetAll().Count() != 0)
             {
@@ -536,14 +536,14 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayInfo("List of clients in database not exists.");
+                DisplayInfo("Clients list in database not exists.");
             }
             DisplayContinueInfo();
         }
 
         public void DisplayAllDataFromDatabase()
         {
-            DisplayInfo("List of books from database:");
+            DisplayInfo("Book list from database:");
             if (_booksRepository.GetAll().ToList().Count > 0)
             {
                 foreach (var item in _booksRepository.GetAll())
@@ -554,10 +554,10 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayErrorMessage("List of books is empty!");
+                DisplayErrorMessage("Book list is empty!");
             }
             Console.WriteLine();
-            DisplayInfo("List of cds music from database:");
+            DisplayInfo("Cds music list from database:");
             if (_cdsMusicRepository.GetAll().ToList().Count > 0)
             {
                 foreach (var item in _cdsMusicRepository.GetAll())
@@ -568,10 +568,10 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayErrorMessage("List of cds music is empty!");
+                DisplayErrorMessage("Cds music list is empty!");
             }
             Console.WriteLine();
-            DisplayInfo("List of pc games from database:");
+            DisplayInfo("PC games list from database:");
             if (_pcGamesRepository.GetAll().ToList().Count > 0)
             {
                 foreach (var item in _pcGamesRepository.GetAll())
@@ -582,10 +582,10 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayErrorMessage("List of pc games is empty!");
+                DisplayErrorMessage("PC games list is empty!");
             }
             Console.WriteLine();
-            DisplayInfo("List of personnel from database:");
+            DisplayInfo("Personnel list from database:");
             if (_employeesRepository.GetAll().ToList().Count > 0)
             {
                 foreach (var item in _employeesRepository.GetAll())
@@ -596,10 +596,10 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayErrorMessage("List of personnel is empty!");
+                DisplayErrorMessage("Personnel list is empty!");
             }
             Console.WriteLine();
-            DisplayInfo("List of clients from database:");
+            DisplayInfo("Clients list from database:");
             if (_clientsRepository.GetAll().ToList().Count > 0)
             {
                 foreach (var item in _clientsRepository.GetAll())
@@ -610,7 +610,7 @@ namespace RentalShopApp.Services.UserCommunication
             }
             else
             {
-                DisplayErrorMessage("List of clients is empty!");
+                DisplayErrorMessage("Clients list is empty!");
             }
             DisplayContinueInfo();
         }

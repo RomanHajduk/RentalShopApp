@@ -26,7 +26,7 @@
     <None Update="Resources\Files\lista klientów.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Files\lista pracowników.csv">
+    <None Update="Resources\Files\employees list.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
